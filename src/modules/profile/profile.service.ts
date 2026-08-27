@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { isNil } from 'lodash';
 import { PrismaService } from '@/core/prisma/prisma.service';
-import { CreateProfileInput } from './dto/create-profile.input';
+import {
+  CreateExperienceNestedInput,
+  CreateProfileInput,
+  CreateProjectNestedInput,
+} from './dto/create-profile.input';
 import { UpdateProfileInput } from './dto/update-profile.input';
 
 @Injectable()
@@ -16,11 +21,50 @@ export class ProfileService {
   }
 
   async create(input: CreateProfileInput) {
-    return this.prisma.profile.create({ data: input });
+    const { experience, projects, skills, ...data } = input;
+
+    return await this.prisma.profile.create({
+      data: {
+        ...data,
+        experience: experience ? { create: experience } : undefined,
+        projects: projects ? { create: projects } : undefined,
+        skills: skills ? { connect: skills.map((id) => ({ id })) } : undefined,
+      },
+    });
   }
 
   async update(id: number, input: UpdateProfileInput) {
-    return this.prisma.profile.update({ where: { id }, data: input });
+    const { experience, projects, skills, ...data } = input;
+
+    return this.prisma.profile.update({
+      where: { id },
+      data: {
+        ...data,
+        projects: {
+          create: projects?.filter((entity) =>
+            isNil(entity.id),
+          ) as CreateProjectNestedInput[],
+          update: projects
+            ?.filter((entity) => !isNil(entity.id))
+            ?.map((entity) => ({
+              where: { id: entity.id! },
+              data: entity,
+            })),
+        },
+        experience: {
+          create: experience?.filter((entity) =>
+            isNil(entity.id),
+          ) as CreateExperienceNestedInput[],
+          update: experience
+            ?.filter((entity) => !isNil(entity.id))
+            ?.map((entity) => ({
+              where: { id: entity.id! },
+              data: entity,
+            })),
+        },
+        skills: skills ? { set: skills.map((id) => ({ id })) } : undefined,
+      },
+    });
   }
 
   async remove(id: number) {

@@ -8,16 +8,29 @@ input CreateExperienceInput {
   profileId: Int!
 }
 
+input CreateExperienceNestedInput {
+  company: String!
+  position: String!
+}
+
 input CreateProfileInput {
   email: String!
+  experience: [CreateExperienceNestedInput!]
   firstName: String!
   lastName: String
+  projects: [CreateProjectNestedInput!]
+  skills: [Int!]
 }
 
 input CreateProjectInput {
   description: String!
   name: String!
   profileId: Int!
+}
+
+input CreateProjectNestedInput {
+  description: String!
+  name: String!
 }
 
 input CreateSkillInput {
@@ -112,11 +125,20 @@ input UpdateExperienceInput {
   profileId: Int
 }
 
+input UpdateExperienceNestedInput {
+  company: String
+  id: Int
+  position: String
+}
+
 input UpdateProfileInput {
   email: String
+  experience: [UpdateExperienceNestedInput!]
   firstName: String
   id: Int!
   lastName: String
+  projects: [UpdateProjectNestedInput!]
+  skills: [Int!]
 }
 
 input UpdateProjectInput {
@@ -124,6 +146,12 @@ input UpdateProjectInput {
   id: Int!
   name: String
   profileId: Int
+}
+
+input UpdateProjectNestedInput {
+  description: String
+  id: Int
+  name: String
 }
 
 input UpdateSkillInput {
