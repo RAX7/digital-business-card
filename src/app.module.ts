@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ProfileModule } from './profile/profile.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { ProfileModule } from '@/modules/profile/profile.module';
+import { PrismaModule } from '@/core/prisma/prisma.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
