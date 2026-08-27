@@ -2,10 +2,28 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateExperienceInput {
+  company: String!
+  position: String!
+  profileId: Int!
+}
+
 input CreateProfileInput {
   email: String!
   firstName: String!
   lastName: String
+}
+
+input CreateProjectInput {
+  description: String!
+  name: String!
+  profileId: Int!
+}
+
+input CreateSkillInput {
+  description: String!
+  email: String!
+  name: String!
 }
 
 """
@@ -13,17 +31,40 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Experience {
+  company: String!
+  createdAt: DateTime!
+  id: Int!
+  position: String!
+  profile: Profile!
+  profileId: Int!
+  updatedAt: DateTime!
+}
+
 type Mutation {
+  createExperience(input: CreateExperienceInput!): Experience!
   createProfile(input: CreateProfileInput!): Profile!
+  createProject(input: CreateProjectInput!): Project!
+  createSkill(input: CreateSkillInput!): Skill!
+  removeExperience(id: Int!): Experience!
   removeProfile(id: Int!): Profile!
+  removeProject(id: Int!): Project!
+  removeSkill(id: Int!): Skill!
+  updateExperience(input: UpdateExperienceInput!): Experience!
   updateProfile(input: UpdateProfileInput!): Profile!
+  updateProject(input: UpdateProjectInput!): Project!
+  updateSkill(input: UpdateSkillInput!): Skill!
 }
 
 type Profile {
   createdAt: DateTime!
 
+  """Description for profile"""
+  description: String
+
   """Email of profile"""
   email: String!
+  experience: [Experience!]!
 
   """Users first name"""
   firstName: String!
@@ -33,12 +74,42 @@ type Profile {
 
   """Users last name"""
   lastName: String
+  projects: [Project!]!
+  skill: [Skill!]!
+  skills: [Skill!]!
+  updatedAt: DateTime!
+}
+
+type Project {
+  createdAt: DateTime!
+  description: String!
+  id: Int!
+  name: String!
+  profile: Profile!
+  profileId: Int!
   updatedAt: DateTime!
 }
 
 type Query {
+  experience(id: Int!): Experience
   profile(id: Int): Profile
   profiles: [Profile!]!
+  project(id: Int!): Project
+  skill(id: Int!): Skill
+}
+
+type Skill {
+  description: String!
+  id: Int!
+  name: String!
+  profiles: [Profile!]!
+}
+
+input UpdateExperienceInput {
+  company: String
+  id: Int!
+  position: String
+  profileId: Int
 }
 
 input UpdateProfileInput {
@@ -46,4 +117,18 @@ input UpdateProfileInput {
   firstName: String
   id: Int!
   lastName: String
+}
+
+input UpdateProjectInput {
+  description: String
+  id: Int!
+  name: String
+  profileId: Int
+}
+
+input UpdateSkillInput {
+  description: String
+  email: String
+  id: Int!
+  name: String
 }

@@ -13,26 +13,31 @@ datasource db {
 }
 
 model Profile {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
   firstName   String
   lastName    String?
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  skills      Skill[]
+  projects    Project[]
+  experience  Experience[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
-
 model Skill {
-  id          Int    @id @default(autoincrement())
-  name        String @unique
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
   description String
+  profiles    Profile[]
 }
 
 model Experience {
   id        Int      @id @default(autoincrement())
   company   String
   position  String
+  profileId Int
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -41,6 +46,8 @@ model Project {
   id          Int      @id @default(autoincrement())
   name        String
   description String
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

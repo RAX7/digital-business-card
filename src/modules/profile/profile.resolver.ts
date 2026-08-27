@@ -1,9 +1,20 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { isNil } from 'lodash';
 import { ProfileService } from './profile.service';
 import { Profile } from './entities/profile.entity';
 import { CreateProfileInput } from './dto/create-profile.input';
 import { UpdateProfileInput } from './dto/update-profile.input';
+import { Skill } from '@/modules/skill/entities/skill.entity';
+import { Experience } from '@/modules/experience/entities/experience.entity';
+import { Project } from '@/modules/project/entities/project.entity';
 
 @Resolver(() => Profile)
 export class ProfileResolver {
@@ -33,8 +44,29 @@ export class ProfileResolver {
     return this.profileService.update(input.id, input);
   }
 
-  @Mutation(() => Profile)
+  @Mutation(() => Profile, { name: 'removeProfile' })
   removeProfile(@Args('id', { type: () => Int }) id: number) {
     return this.profileService.remove(id);
+  }
+
+  @ResolveField(() => [Skill])
+  async skills(@Parent() profile: Profile) {
+    return this.profileService.getSkillsByProfileId(profile.id);
+  }
+
+  @ResolveField(() => [Experience])
+  async experience(@Parent() profile: Profile) {
+    const result = await this.profileService.getExperienceByProfileId(
+      profile.id,
+    );
+
+    return result ?? [];
+  }
+
+  @ResolveField(() => [Project])
+  async projects(@Parent() profile: Profile) {
+    const result = await this.profileService.getProjectsByProfileId(profile.id);
+
+    return result ?? [];
   }
 }
