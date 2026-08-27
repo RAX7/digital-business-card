@@ -4,12 +4,16 @@
 
 input CreateExperienceInput {
   company: String!
+  firstWorkDay: DateTime!
+  lastWorkDay: DateTime!
   position: String!
   profileId: Int!
 }
 
 input CreateExperienceNestedInput {
   company: String!
+  firstWorkDay: DateTime!
+  lastWorkDay: DateTime!
   position: String!
 }
 
@@ -47,7 +51,9 @@ scalar DateTime
 type Experience {
   company: String!
   createdAt: DateTime!
+  firstWorkDay: DateTime!
   id: Int!
+  lastWorkDay: DateTime!
   position: String!
   profile: Profile!
   profileId: Int!
@@ -120,14 +126,18 @@ type Skill {
 
 input UpdateExperienceInput {
   company: String
+  firstWorkDay: DateTime
   id: Int!
+  lastWorkDay: DateTime
   position: String
   profileId: Int
 }
 
 input UpdateExperienceNestedInput {
   company: String
+  firstWorkDay: DateTime
   id: Int
+  lastWorkDay: DateTime
   position: String
 }
 

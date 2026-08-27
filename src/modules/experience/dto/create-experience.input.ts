@@ -8,6 +8,12 @@ export class CreateExperienceInput {
   @Field(() => String)
   position!: string;
 
+  @Field(() => Date)
+  firstWorkDay!: Date;
+
+  @Field(() => Date)
+  lastWorkDay?: Date | null;
+
   @Field(() => Int)
   profileId!: number;
 }
