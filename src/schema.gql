@@ -39,7 +39,6 @@ input CreateProjectNestedInput {
 
 input CreateSkillInput {
   description: String!
-  email: String!
   name: String!
 }
 
@@ -190,7 +189,6 @@ input UpdateProjectNestedInput {
 
 input UpdateSkillInput {
   description: String
-  email: String
   id: Int!
   name: String
 }
