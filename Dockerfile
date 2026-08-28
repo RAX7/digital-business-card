@@ -7,11 +7,11 @@ RUN apt-get update && \
 WORKDIR /home/node/app
 
 COPY package*.json ./
-
 RUN npm install
-RUN npx prisma generate
-# RUN npx prisma migrate deploy
-RUN npx prisma migrate dev
+
+COPY ./scripts ./scripts
+
 EXPOSE 3000
 
-CMD [ "npm", "run", "start:dev" ]
+ENTRYPOINT ["sh", "./scripts/startup.sh"]
+CMD ["dev"]

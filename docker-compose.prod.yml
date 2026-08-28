@@ -3,13 +3,12 @@ services:
     container_name: nestjs
     build:
       context: ./
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.prod
     env_file:
       - ./.env
     ports:
       - '3000:3000'
     volumes:
-      - ./:/home/node/app
       - /home/node/app/node_modules
     depends_on:
       apidb:

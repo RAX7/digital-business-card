@@ -1,0 +1,25 @@
+#STAGE 1
+FROM node:24-slim as build
+
+WORKDIR /home/node/app
+
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+#STAGE 2
+FROM node:24-slim
+
+RUN apt-get update && \
+  apt-get install -y procps && \
+  rm -rf /var/lib/apt/lists/*
+
+WORKDIR /home/node/app
+
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY --from=build /home/node/app/dist ./dist
+
+ENTRYPOINT ["sh", "./scripts/startup.sh"]
+CMD ["prod"]
