@@ -1,8 +1,4 @@
-FROM node:24-slim
-
-RUN apt-get update && \
-  apt-get install -y procps && \
-  rm -rf /var/lib/apt/lists/*
+FROM node:alpine3.24
 
 WORKDIR /home/node/app
 
