@@ -1,10 +1,22 @@
+import fs from 'fs/promises';
+import { join } from 'path';
+import YAML from 'yaml';
+import { isObject } from 'lodash';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
+import Ajv, { ErrorObject } from 'ajv';
+import addFormats from 'ajv-formats';
+import { SomeJSONSchema } from 'ajv/dist/types/json-schema';
+
 import { CreateSkillInput } from '@/modules/skill/dto/create-skill.input';
-import {
-  CreateExperienceNestedInput,
-  CreateProjectNestedInput,
-} from '@/modules/profile/dto/create-profile.input';
+import { CreateProfileInput } from '@/modules/profile/dto/create-profile.input';
+
+type SeedData = {
+  skills: Array<CreateSkillInput>;
+  profiles: Array<
+    Omit<CreateProfileInput, 'skills'> & { skills?: CreateSkillInput[] }
+  >;
+};
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -12,141 +24,43 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter });
 
-function randomDateRanges(startDate: Date, endDate: Date, count: number) {
-  const startMs = startDate.getTime();
-  const endMs = endDate.getTime();
-
-  const oneDay = 24 * 60 * 60 * 1000;
-  const totalDays = Math.floor((endMs - startMs) / oneDay);
-
-  const uniqueDays = new Set<number>();
-
-  while (uniqueDays.size < count * 2) {
-    const randomDayOffset = Math.floor(Math.random() * (totalDays + 1));
-    uniqueDays.add(randomDayOffset);
-  }
-
-  const sortedDays = Array.from(uniqueDays).sort((a, b) => a - b);
-
-  const ranges: Array<{ start: Date; end: Date }> = [];
-
-  for (let i = 0; i < sortedDays.length; i += 2) {
-    const startRangeMs = startMs + sortedDays[i] * oneDay;
-    const endRangeMs = startMs + sortedDays[i + 1] * oneDay;
-    const range = { start: new Date(startRangeMs), end: new Date(endRangeMs) };
-
-    ranges.push(range);
-  }
-
-  return ranges;
-}
-
 async function main() {
   console.log('Fill database with initial data...');
 
-  const skillDtos: CreateSkillInput[] = [
-    {
-      name: 'JS',
-      description:
-        'JavaScript (JS) is a programming language and core technology of the Web, alongside HTML and CSS. ',
-    },
-    {
-      name: 'TS',
-      description:
-        'TypeScript (TS) is a high-level programming language that adds static typing with optional type annotations to JavaScript.',
-    },
-    {
-      name: 'CSS',
-      description:
-        'Cascading Style Sheets (CSS) is a style sheet language used for specifying the presentation and styling of a document written in a markup language, such as HTML or XML (including XML dialects such as SVG, MathML, or XHTML)',
-    },
-    {
-      name: 'Git',
-      description:
-        'Git is a distributed version control software system that is capable of managing versions of source code or data.',
-    },
-    {
-      name: 'Linux',
-      description:
-        'Linux is a family of free and open-source software Unix-like operating systems based on the Linux kernel, which was first released on 17 September 1991 by Linus Torvalds.',
-    },
-    {
-      name: 'SQL',
-      description:
-        'Structured Query Language (SQL) is a domain-specific language used to manage data, especially in a relational database management system (RDBMS).',
-    },
-    {
-      name: 'Angular',
-      description:
-        'Angular (also referred to as Angular 2+) is a TypeScript-based free and open-source single-page web application framework. It is developed by Google and by a community of individuals and corporations.',
-    },
-    {
-      name: 'Vue',
-      description:
-        'Vue.js (commonly referred to as Vue; pronounced "view") is an open-source model–view–viewmodel front end JavaScript framework for building user interfaces and single-page applications.',
-    },
-    {
-      name: 'React',
-      description:
-        'React (also known as React.js or ReactJS) is a free and open-source front-end JavaScript library that aims to make building user interfaces based on components more "seamless".',
-    },
-  ];
+  const seedData = await loadSeedData();
 
-  const skillEntities: Array<CreateSkillInput & { id: number }> = [];
+  const skillEntities: Array<{
+    source: CreateSkillInput;
+    entity: CreateSkillInput & { id: number };
+  }> = [];
 
-  for (const data of skillDtos) {
-    const result = await prisma.skill.create({ data });
-    skillEntities.push(result);
+  for (const source of seedData.skills) {
+    const entity = await prisma.skill.create({ data: source });
+    skillEntities.push({ source, entity });
   }
 
-  for (let i = 1; i <= 10; i++) {
-    const experienceDays = randomDateRanges(
-      new Date(2005, 0, 1),
-      new Date(),
-      5,
-    );
-
-    const experiences = Array.from({ length: 5 }, (_, index) => {
-      const experience: CreateExperienceNestedInput = {
-        company: `SomeCompanyName-${index}`,
-        position: `Postion-${index}`,
-        firstWorkDay: experienceDays[index].start,
-        lastWorkDay: experienceDays[index].end,
-      };
-
-      return experience;
-    });
-
-    const projects = Array.from({ length: 5 }, (_, index) => {
-      const project: CreateProjectNestedInput = {
-        name: `SomeProjectName-${index}`,
-        description: `SomeProjectDescription-${index}`,
-      };
-
-      return project;
-    });
-
-    const skills = [...skillEntities]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-
+  for (const data of seedData.profiles) {
     await prisma.profile.create({
       data: {
-        email: `profile-${i}@example.com`,
-        firstName: `FirstName-${i}`,
-        lastName: `LastName-${i}`,
+        ...data,
         experience: {
           createMany: {
-            data: experiences,
+            data: data.experience ?? [],
           },
         },
         projects: {
           createMany: {
-            data: projects,
+            data: data.projects ?? [],
           },
         },
         skills: {
-          connect: skills.map((s) => ({ id: s.id })),
+          connect: (data.skills ?? [])
+            .map(
+              (skill) =>
+                skillEntities.find((e) => e.source === skill)?.entity?.id,
+            )
+            .filter((id): id is number => Boolean(id))
+            .map((id) => ({ id })),
         },
       },
     });
@@ -163,3 +77,63 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+class ValidationError extends Error {
+  errors: ErrorObject[];
+
+  constructor(errors: ErrorObject[]) {
+    super();
+    this.errors = errors;
+  }
+}
+
+async function loadSeedData(): Promise<SeedData> {
+  const ajv = new Ajv();
+  addFormats(ajv);
+
+  const schemaJson = await fs.readFile(
+    join(__dirname, 'json-schema/json-schema.json'),
+    { encoding: 'utf8' },
+  );
+
+  const schema = JSON.parse(schemaJson) as SomeJSONSchema;
+  const skipRequiredFields = new Set(['updatedAt']);
+
+  if (schema.definitions) {
+    for (const def of Object.values(schema.definitions)) {
+      if (Array.isArray(def.required)) {
+        def.required = def.required.filter(
+          (f: string) => !skipRequiredFields.has(f),
+        );
+      }
+
+      if (Array.isArray(def.required) && isObject(def.properties)) {
+        const props = new Set(Object.keys(def.properties));
+        def.required = def.required.filter((f: string) => props.has(f));
+      }
+    }
+  }
+
+  ajv.addSchema(schema);
+
+  const dataYaml = await fs.readFile(join(__dirname, 'seed.yaml'), {
+    encoding: 'utf8',
+  });
+
+  const data = YAML.parse(dataYaml) as SeedData;
+  const validator = ajv.getSchema(`#/definitions/Profile`)!;
+
+  for (const profile of data.profiles) {
+    const isValid = validator(profile);
+
+    if (
+      !isValid &&
+      Array.isArray(validator.errors) &&
+      validator.errors.length > 0
+    ) {
+      throw new ValidationError(validator.errors);
+    }
+  }
+
+  return data;
+}

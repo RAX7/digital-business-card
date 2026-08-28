@@ -1,0 +1,62 @@
+skills:
+  - &skill_1 {
+      name: 'JS',
+      description: 'JavaScript (JS) is a programming language and core technology of the Web, alongside HTML and CSS.'
+    }
+  - &skill_2 {
+      name: 'TS',
+      description: 'TypeScript (TS) is a high-level programming language that adds static typing with optional type annotations to JavaScript.'
+    }
+  - &skill_3 {
+    name: 'CSS',
+    description: 'Cascading Style Sheets (CSS) is a style sheet language used for specifying the presentation and styling of a document written in a markup language, such as HTML or XML (including XML dialects such as SVG, MathML, or XHTML)'
+  }
+  - &skill_4 {
+    name: 'Git',
+    description: 'Git is a distributed version control software system that is capable of managing versions of source code or data.'
+  }
+  - &skill_5 {
+    name: 'Linux',
+    description: 'Linux is a family of free and open-source software Unix-like operating systems based on the Linux kernel, which was first released on 17 September 1991 by Linus Torvalds.'
+  }
+  - &skill_6 {
+    name: 'SQL',
+    description: 'Structured Query Language (SQL) is a domain-specific language used to manage data, especially in a relational database management system (RDBMS).'
+  }
+  - &skill_7 {
+    name: 'Angular',
+    description: 'Angular (also referred to as Angular 2+) is a TypeScript-based free and open-source single-page web application framework. It is developed by Google and by a community of individuals and corporations.'
+  }
+  - &skill_8 {
+    name: 'Vue',
+    description: 'Vue.js (commonly referred to as Vue; pronounced "view") is an open-source model–view–viewmodel front end JavaScript framework for building user interfaces and single-page applications.'
+  }
+  - &skill_9 {
+    name: 'React',
+    description: 'React (also known as React.js or ReactJS) is a free and open-source front-end JavaScript library that aims to make building user interfaces based on components more "seamless".'
+  }
+
+profiles:
+  [
+    {
+      email: 'String',
+      firstName: 'String',
+      lastName: 'String?',
+      description: ' String?',
+      skills: [
+        *skill_1,
+        *skill_2,
+        *skill_7
+      ],
+      projects: [
+        { name: 'Some Project Name 1', description: 'description' },
+        { name: 'Some Project Name 2', description: 'description' },
+        { name: 'Some Project Name 3', description: 'description' },
+      ],
+      experience: [
+        { company: 'Apple', position: 'Developer', firstWorkDay: '2023-08-28T00:00:00Z' },
+        { company: 'Google', position: 'Developer', firstWorkDay: '2024-08-28T00:00:00Z' },
+        { company: 'Facebook', position: 'Developer', firstWorkDay: '2025-08-28T00:00:00Z' },
+      ],
+    },
+  ]

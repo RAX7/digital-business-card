@@ -3,6 +3,11 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
+generator jsonSchema {
+  provider              = "prisma-json-schema-generator"
+  includeRequiredFields = "true"
+}
+
 generator client {
   provider = "prisma-client-js"
   // output   = "./generated"
@@ -36,7 +41,7 @@ model Experience {
   id           Int       @id @default(autoincrement())
   company      String
   position     String
-  firstWorkDay DateTime  @db.Date @default(dbgenerated("'1970-01-01 00:00:00'"))
+  firstWorkDay DateTime  @default(dbgenerated("'1970-01-01 00:00:00'")) @db.Date
   lastWorkDay  DateTime? @db.Date
   profileId    Int
   profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
