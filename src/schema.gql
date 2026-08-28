@@ -43,6 +43,11 @@ input CreateSkillInput {
   name: String!
 }
 
+input DateFilterInput {
+  gte: DateTime
+  lte: DateTime
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -60,6 +65,13 @@ type Experience {
   updatedAt: DateTime!
 }
 
+input ExperienceFilterInput {
+  firstWorkDay: DateFilterInput
+  id: Float
+  lastWorkDay: DateFilterInput
+  search: String
+}
+
 type Mutation {
   createExperience(input: CreateExperienceInput!): Experience!
   createProfile(input: CreateProfileInput!): Profile!
@@ -73,6 +85,11 @@ type Mutation {
   updateProfile(input: UpdateProfileInput!): Profile!
   updateProject(input: UpdateProjectInput!): Project!
   updateSkill(input: UpdateSkillInput!): Skill!
+}
+
+input OrderByInput {
+  field: String!
+  order: SortOrder! = Asc
 }
 
 type Profile {
@@ -111,6 +128,7 @@ type Project {
 
 type Query {
   experience(id: Int!): Experience
+  experiences(filter: ExperienceFilterInput, orderBy: [OrderByInput!], skip: Int = 0, take: Int = 10): [Experience!]!
   profile(id: Int): Profile
   profiles: [Profile!]!
   project(id: Int!): Project
@@ -122,6 +140,12 @@ type Skill {
   id: Int!
   name: String!
   profiles: [Profile!]!
+}
+
+"""Data sorting direction"""
+enum SortOrder {
+  Asc
+  Desc
 }
 
 input UpdateExperienceInput {

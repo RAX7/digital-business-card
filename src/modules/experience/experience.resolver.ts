@@ -3,14 +3,15 @@ import { ExperienceService } from './experience.service';
 import { Experience } from './entities/experience.entity';
 import { CreateExperienceInput } from './dto/create-experience.input';
 import { UpdateExperienceInput } from './dto/update-experience.input';
+import { FindAllExperienceArgs } from './dto/find-all-experience.args';
 
 @Resolver(() => Experience)
 export class ExperienceResolver {
   constructor(private readonly experienceService: ExperienceService) {}
 
-  @Query(() => [Experience], { name: 'experience' })
-  findAll() {
-    return this.experienceService.findAll();
+  @Query(() => [Experience], { name: 'experiences' })
+  findAll(@Args() args: FindAllExperienceArgs) {
+    return this.experienceService.findAll(args);
   }
 
   @Query(() => Experience, { name: 'experience', nullable: true })
