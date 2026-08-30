@@ -39,10 +39,10 @@ skills:
 profiles:
   [
     {
-      email: 'String',
-      firstName: 'String',
-      lastName: 'String?',
-      description: ' String?',
+      email: 'ivanov@example.com',
+      firstName: 'Anton',
+      lastName: 'Ivanov',
+      description: 'JavaScript developer',
       skills: [
         *skill_1,
         *skill_2,
