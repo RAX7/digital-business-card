@@ -10,8 +10,7 @@ DATABASE_SEEDED_FILE="./.database_seeded"
 
 if [ ! -f "$DATABASE_SEEDED_FILE" ]; then
   echo "Seeding DB"
-  npm run prisma:seed
-  touch "$DATABASE_SEEDED_FILE"
+  node dist/prisma/seed.js && touch "$DATABASE_SEEDED_FILE"
 fi
 
 if [ "$1" = "prod" ]; then

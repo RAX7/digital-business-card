@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import Ajv, { ErrorObject } from 'ajv';
 import addFormats from 'ajv-formats';
 import { SomeJSONSchema } from 'ajv/dist/types/json-schema';
+import appRootPath from 'app-root-path';
 
 import { CreateSkillInput } from '@/modules/skill/dto/create-skill.input';
 import { CreateProfileInput } from '@/modules/profile/dto/create-profile.input';
@@ -88,11 +89,13 @@ class ValidationError extends Error {
 }
 
 async function loadSeedData(): Promise<SeedData> {
+  const root = appRootPath.path;
+
   const ajv = new Ajv();
   addFormats(ajv);
 
   const schemaJson = await fs.readFile(
-    join(__dirname, 'json-schema/json-schema.json'),
+    join(root, 'prisma/json-schema/json-schema.json'),
     { encoding: 'utf8' },
   );
 
@@ -116,7 +119,7 @@ async function loadSeedData(): Promise<SeedData> {
 
   ajv.addSchema(schema);
 
-  const dataYaml = await fs.readFile(join(__dirname, 'seed.yaml'), {
+  const dataYaml = await fs.readFile(join(root, 'prisma/seed.yaml'), {
     encoding: 'utf8',
   });
 
