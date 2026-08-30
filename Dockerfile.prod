@@ -1,10 +1,10 @@
-FROM node:alpine3.24 AS build
+FROM node:alpine3.24
 
 WORKDIR /home/node/app
 
 COPY package*.json ./
 RUN npm install
-COPY --exclude=node_modules --exclude=dist . .
+COPY . .
 RUN npm run build
 
 ENTRYPOINT ["sh", "./scripts/startup.sh"]
