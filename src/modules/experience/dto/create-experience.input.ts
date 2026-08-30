@@ -11,7 +11,7 @@ export class CreateExperienceInput {
   @Field(() => Date)
   firstWorkDay!: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   lastWorkDay?: Date | null;
 
   @Field(() => Int)
