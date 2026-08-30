@@ -7,6 +7,7 @@ import {
   CreateProjectNestedInput,
 } from './dto/create-profile.input';
 import { UpdateProfileInput } from './dto/update-profile.input';
+import { FindAllProfileArgs } from './dto/find-all-profile.args';
 
 @Injectable()
 export class ProfileService {
@@ -38,6 +39,10 @@ export class ProfileService {
 
   async findOne(id: number) {
     return this.prisma.profile.findUnique({ where: { id } });
+  }
+
+  async findOneByEmail(email: string) {
+    return this.prisma.profile.findUnique({ where: { email } });
   }
 
   async create(input: CreateProfileInput) {

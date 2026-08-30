@@ -135,6 +135,8 @@ type Project {
 type Query {
   experience(id: Int!): Experience
   experiences(filter: ExperienceFilterInput, orderBy: [OrderByInput!], skip: Int = 0, take: Int = 10): [Experience!]!
+  ownProfile: Profile!
+  profile(id: Int!): Profile!
   profiles(filter: ProfileFilterInput, orderBy: [OrderByInput!], skip: Int = 0, take: Int = 10): [Profile!]!
   project(id: Int!): Project
   skill(id: Int!): Skill

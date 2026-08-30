@@ -6,15 +6,19 @@ import {
   Int,
   ResolveField,
   Parent,
+  Context,
 } from '@nestjs/graphql';
+import { UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { isNil } from 'lodash';
 import { ProfileService } from './profile.service';
 import { Profile } from './entities/profile.entity';
 import { CreateProfileInput } from './dto/create-profile.input';
 import { UpdateProfileInput } from './dto/update-profile.input';
+import { FindAllProfileArgs } from './dto/find-all-profile.args';
 import { Skill } from '@/modules/skill/entities/skill.entity';
 import { Experience } from '@/modules/experience/entities/experience.entity';
 import { Project } from '@/modules/project/entities/project.entity';
+import { type GraphQLContext } from '@/core/types/graphql-context';
 
 @Resolver(() => Profile)
 export class ProfileResolver {
@@ -25,13 +29,30 @@ export class ProfileResolver {
     return this.profileService.findAll(args);
   }
 
-  @Query(() => Profile, { name: 'profile', nullable: true })
-  findOne(@Args('id', { type: () => Int, nullable: true }) id?: number) {
-    if (isNil(id)) {
-      return this.profileService.findOne(1);
+  @Query(() => Profile, { name: 'profile' })
+  async findOne(@Args('id', { type: () => Int }) id: number) {
+    const profile = await this.profileService.findOne(id);
+
+    if (isNil(profile)) {
+      throw new NotFoundException();
     }
 
-    return this.profileService.findOne(id);
+    return profile;
+  }
+
+  @Query(() => Profile, { name: 'ownProfile' })
+  async findOwn(@Context() ctx: GraphQLContext) {
+    if (isNil(ctx.auth) || isNil(ctx.auth.user)) {
+      throw new UnauthorizedException();
+    }
+
+    const profile = await this.profileService.findOneByEmail(ctx.auth.user);
+
+    if (isNil(profile)) {
+      throw new NotFoundException();
+    }
+
+    return profile;
   }
 
   @Mutation(() => Profile, { name: 'createProfile' })
