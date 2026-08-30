@@ -12,8 +12,28 @@ import { UpdateProfileInput } from './dto/update-profile.input';
 export class ProfileService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.profile.findMany({ take: 100 });
+  async findAll(args: FindAllProfileArgs) {
+    const { skip, take, filter, orderBy } = args;
+
+    return this.prisma.profile.findMany({
+      skip,
+      take,
+      where: {
+        id: filter?.id,
+        createdAt: filter?.createdAt,
+        updatedAt: filter?.updatedAt,
+        OR: filter?.search
+          ? [
+              { firstName: { contains: filter.search, mode: 'insensitive' } },
+              { lastName: { contains: filter.search, mode: 'insensitive' } },
+              { description: { contains: filter.search, mode: 'insensitive' } },
+            ]
+          : undefined,
+      },
+      orderBy: orderBy?.map((el) => ({
+        [el.field]: el.order,
+      })),
+    });
   }
 
   async findOne(id: number) {

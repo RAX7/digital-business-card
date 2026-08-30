@@ -21,8 +21,8 @@ export class ProfileResolver {
   constructor(private readonly profileService: ProfileService) {}
 
   @Query(() => [Profile], { name: 'profiles' })
-  findAll() {
-    return this.profileService.findAll();
+  findAll(@Args() args: FindAllProfileArgs) {
+    return this.profileService.findAll(args);
   }
 
   @Query(() => Profile, { name: 'profile', nullable: true })
