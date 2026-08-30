@@ -57,7 +57,7 @@ type Experience {
   createdAt: DateTime!
   firstWorkDay: DateTime!
   id: Int!
-  lastWorkDay: DateTime!
+  lastWorkDay: DateTime
   position: String!
   profile: Profile!
   profileId: Int!
