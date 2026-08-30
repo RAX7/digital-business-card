@@ -16,6 +16,8 @@ WORKDIR /home/node/app
 COPY package*.json ./
 RUN npm install --omit=dev
 COPY --from=build /home/node/app/dist ./dist
+COPY --from=build /home/node/app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /home/node/app/node_modules/@prisma ./node_modules/@prisma
 COPY ./prisma ./prisma
 COPY ./scripts ./scripts
 

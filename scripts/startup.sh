@@ -1,8 +1,5 @@
 #!/bin/sh
 
-echo "Generate Prisma client"
-npm run prisma:generate
-
 echo "Apply DB migrations"
 npm run prisma:deploy
 
